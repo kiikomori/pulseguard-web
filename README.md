@@ -27,7 +27,7 @@ Pulseguard is een nieuw, opkomend medisch wearable-systeem. Het is een horloge d
 
 ## How to
 
-start_local.bat om de website op een eigen lokale machine te kunnen testen.
+[start_local.bat](start_local.bat) om de website op een eigen lokale machine te kunnen testen.
 
 1 – Demo database zonder reset.
 
