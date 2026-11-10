@@ -1,0 +1,39 @@
+<!doctype html><html lang="en" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PulseGuard API</title><script src="/static/docs/origin.js" defer></script><link rel="stylesheet" href="/static/css/app.css"></head><body><main class="prose"><article class="page prose"><h1>PulseGuard watch API (v1)</h1>
+<p>Authentication: <code>Authorization: Bearer &lt;API key&gt;</code>. Each account has <strong>one API key</strong>, created on the <strong>API page</strong> (<code>/api</code>). Making a new key revokes the old one; the key is shown once and stored hashed. No cookies, so no CSRF token is needed.</p>
+<p>Every request made with a valid key appears on the API page: time, endpoint, status, how many readings were saved, already received or rejected (with the reason), field names, device names and the time span. The raw body is not stored.</p>
+<p>Base URL: <code><span data-origin>https://&lt;uw-site&gt;</span>/api/v1</code>. All timestamps are ISO 8601; send UTC (<code>Z</code>) or an offset. Rate limit: 120 requests per hour per code (enough for one upload a minute plus catch-up).</p>
+<h2><code>GET /status</code></h2>
+<p>Checks the code and returns the server clock.</p>
+<pre><code>
+{ &quot;ok&quot;: true, &quot;server_time&quot;: &quot;2026-11-04T18:05:00Z&quot;, &quot;max_batch&quot;: 500 }
+</code></pre>
+<h2><code>POST /readings</code> (recommended, every few minutes)</h2>
+<p>Send one reading, a list, or <code>{ &quot;readings&quot;: [...] }</code> (max 500 per request).</p>
+<table><tr><td>Field</td><td>Type</td><td>Range</td><td>Notes</td></tr>
+<tr><td><code>ts</code></td><td>string</td><td>≤ 5 min in the future, ≤ 30 days old</td><td>required</td></tr>
+<tr><td><code>bpm</code></td><td>number</td><td>20–250</td><td>heart rate</td></tr>
+<tr><td><code>spo2</code></td><td>number</td><td>50–100</td><td>blood oxygen %</td></tr>
+<tr><td><code>temp_c</code></td><td>number</td><td>30–45</td><td>skin temperature °C</td></tr>
+<tr><td><code>steps</code></td><td>number</td><td>0–100000</td><td>steps <strong>since the previous reading</strong> (a delta, not a daily total)</td></tr>
+<tr><td><code>activity</code></td><td>string</td><td><code>rest</code>, <code>light</code>, <code>moderate</code>, <code>vigorous</code>, <code>sleep</code></td><td>lets PulseGuard skip high-heart-rate alerts during exercise</td></tr>
+<tr><td><code>device</code></td><td>string</td><td>≤ 40 chars</td><td>default <code>watch</code></td></tr>
+</table><p>At least one of <code>bpm</code>, <code>spo2</code>, <code>temp_c</code>, <code>steps</code> is required. Unknown fields are rejected.</p>
+<pre><code>
+curl -X POST <span data-origin>https://&lt;uw-site&gt;</span>/api/v1/readings \
+  -H &quot;Authorization: Bearer $PULSEGUARD_KEY&quot; -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;readings&quot;:[{&quot;ts&quot;:&quot;2026-11-04T18:00:00Z&quot;,&quot;bpm&quot;:72,&quot;spo2&quot;:97,&quot;temp_c&quot;:36.6,&quot;steps&quot;:120,&quot;activity&quot;:&quot;light&quot;}]}&#x27;
+</code></pre>
+<p>Response (<code>200</code> when anything was accepted or already stored, <code>400</code> when everything was rejected):</p>
+<pre><code>
+{ &quot;accepted&quot;: 1, &quot;duplicates&quot;: 0, &quot;rejected&quot;: 0, &quot;errors&quot;: [], &quot;alerts&quot;: 0 }
+</code></pre>
+<ul><li><strong>Idempotent:</strong> the same <code>(device, ts)</code> is stored once, so a watch can safely resend after a network error.</li>
+<li><strong>Alerts:</strong> readings from the last 6 hours are checked against the user&#x27;s own limits; old backfill never raises alerts.</li>
+<li><code>errors</code> lists <code>{ &quot;index&quot;, &quot;error&quot; }</code> per rejected item, e.g. <code>out_of_range_bpm</code>, <code>ts_in_future</code>, <code>unknown_fields</code>.</li>
+</ul><h2><code>POST /entries</code> (Health Quest compatible)</h2>
+<p>Unchanged payload: <code>date</code>, <code>time</code>, <code>steps</code>, <code>sleep</code>, <code>water</code>, <code>weight</code>, <code>bpm</code>, <code>notes</code>. A <code>bpm</code> value is also stored as a reading.</p>
+<h2>Errors</h2>
+<p><code>401 invalid_api_key</code> · <code>413 batch_too_large</code> · <code>429 rate_limited</code> · <code>400 invalid_json</code>.</p>
+<hr>
+<h1>Nederlands (kort)</h1>
+<p>Stuur metingen met <code>POST /api/v1/readings</code> en uw API-sleutel (te maken op de API-pagina, <code>/api</code>) als <code>Authorization: Bearer …</code>. Eén meting, een lijst of <code>{&quot;readings&quot;: [...]}</code>, maximaal 500 per keer. <code>steps</code> is het aantal stappen sinds de vorige meting. Dezelfde meting twee keer sturen is veilig. Meldingen ontstaan alleen voor metingen van de afgelopen 6 uur.</p></article></main></body></html>
