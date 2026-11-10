@@ -44,3 +44,13 @@ admin              / admin demo password (nieuw wachtwoord invoeren na inloggen)
 demo               / rustig ademen bij de zee
 dr.jansen          / zorgvuldig meekijken bij anne
 ```
+---
+Copyright 2026 PulseGuard Technologies.
+
+Originally developed by the PulseGuard Team.
+
+This project is licensed under the [Apache License, Version 2.0](LICENSE).
+You may obtain a copy of the License at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+Modified versions must retain the applicable original attribution notices.
