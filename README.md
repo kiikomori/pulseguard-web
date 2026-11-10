@@ -16,23 +16,28 @@ Pulseguard is een nieuw, opkomend medisch wearable-systeem. Het is een horloge d
 
 
 
+[![License](https://img.shields.io/github/license/kiikomori/pulseguard-web)](LICENSE)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Contributions](https://img.shields.io/badge/Contributions-Team%20Members%20Only-blue)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-blue)
 
 
 
 
 
-
-
----
 ## How to
 
-start_local.bat om het te testen op jouw eigen local machine
+start_local.bat om de website op een eigen lokale machine te kunnen testen.
 
-1 voor demo-database (zonder reset)
+1 – Demo database zonder reset.
 
-2 voor demo-database (met reset)
 
-3 voor prod database
+
+2 – Demo database met reset.
+
+
+
+3 – Productiedatabase.
 
 ### demo accounts:
 
@@ -54,3 +59,6 @@ You may obtain a copy of the License at:
 https://www.apache.org/licenses/LICENSE-2.0
 
 Modified versions must retain the applicable original attribution notices.
+
+
+<sub>info@pulseguard-technologies.nl</sub>
